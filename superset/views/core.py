@@ -403,9 +403,7 @@ class CsvToDatabaseView(SimpleFormView):
                   dayfirst, thousands, decimal, quotechar, escapechar, comment,
                   encoding, error_bad_lines, chunksize):
         # Use Pandas to parse csv file to a dataframe
-        upload_path = 'http://' + config['SUPERSET_WEBSERVER_ADDRESS'] + ':' \
-                      + str(config['SUPERSET_WEBSERVER_PORT']) \
-                      + url_for('uploaded_file', filename=filepath_or_buffer)
+        upload_path = config['UPLOAD_FOLDER'] + filepath_or_buffer
         # Expose this to api so can specify each field
         chunks = pandas.read_csv(filepath_or_buffer=upload_path,
                                  sep=sep,

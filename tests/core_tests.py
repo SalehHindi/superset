@@ -647,18 +647,19 @@ class CoreTests(SupersetTestCase):
 
     def test_import_csv(self):
         self.login(username='admin')
-        config = app.config
+
+        os.environ['SUPERSET_CONFIG'] = 'tests.superset_test_config'
+        con = app.config.get('SQLALCHEMY_DATABASE_URI')
 
         test_file = open('tests/testCSV.csv', 'w+')
-
         test_file.write(u'Column 1, Column 2\n')
-        test_file.write(u'Test1, Test 2')
+        test_file.write(u'Test 1, Test 2')
         test_file.seek(0)
 
         form_data = {'csv_file': test_file,
                             'sep': ',',
                             'name': 'TestName',
-                            'con': config['SQLALCHEMY_DATABASE_URI'],
+                            'con': con,
                             'if_exists': 'append',
                             'index_label': 'test_label',
                             'chunksize': 1,
