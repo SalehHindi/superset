@@ -13,6 +13,7 @@ import random
 import unittest
 import os
 import csv
+import sys
 
 from flask import escape
 
@@ -652,7 +653,11 @@ class CoreTests(SupersetTestCase):
         os.environ['SUPERSET_CONFIG'] = 'tests.superset_test_config'
         con = app.config.get('SQLALCHEMY_DATABASE_URI')
 
-        test_file = open('tests/testCSV.csv', 'w+b')
+        if sys.version_info[0] == 2:
+            test_file = open('tests/testCSV.csv', 'w+b')
+        elif sys.version_info[0] == 3:
+            test_file = open('tests/testCSV.csv', 'r+')
+
         csv_writer = csv.writer(test_file)
         csv_writer.writerow(['Column 1','Column 2'])
         csv_writer.writerow(['Test 1','Test 2'])
