@@ -12,8 +12,6 @@ import io
 import random
 import unittest
 import os
-import unicodecsv
-#
 
 from flask import escape
 
@@ -653,9 +651,8 @@ class CoreTests(SupersetTestCase):
 
         test_file = open('tests/testCSV.csv', 'w+')
 
-        writer = unicodecsv.writer(test_file, encoding='utf-8')
-        writer.writerow((u'Column 1', u'Column 2'))
-        writer.writerow((u'Column 3', u'Column 4'))
+        test_file.write(u'Column 1, Column 2\n')
+        test_file.write(u'Test1, Test 2')
         test_file.seek(0)
 
         form_data = {'csv_file': test_file,
