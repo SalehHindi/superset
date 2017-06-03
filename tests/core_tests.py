@@ -656,7 +656,7 @@ class CoreTests(SupersetTestCase):
         if sys.version_info[0] == 2:
             test_file = open('tests/testCSV.csv', 'w+b')
         elif sys.version_info[0] == 3:
-            test_file = open('tests/testCSV.csv', 'r+')
+            test_file = open('tests/testCSV.csv', 'w+')
 
         csv_writer = csv.writer(test_file)
         csv_writer.writerow(['Column 1','Column 2'])
