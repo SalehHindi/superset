@@ -655,12 +655,13 @@ class CoreTests(SupersetTestCase):
 
         if sys.version_info[0] == 2:
             test_file = open('tests/testCSV.csv', 'w+b')
+            csv_writer = csv.writer(test_file)
+            csv_writer.writerow(['Column 1', 'Column 2'])
+            csv_writer.writerow(['Test 1', 'Test 2'])
         elif sys.version_info[0] == 3:
-            test_file = open('tests/testCSV.csv', 'w+')
-
-        csv_writer = csv.writer(test_file)
-        csv_writer.writerow(['Column 1','Column 2'])
-        csv_writer.writerow(['Test 1','Test 2'])
+            test_file = open('tests/testCSV.csv' , 'ab+')
+            test_file.write(b'Column 1, Column 2\n')
+            test_file.write(b'Column 3, Column 4')
         test_file.seek(0)
 
         form_data = {'csv_file': test_file,
