@@ -296,6 +296,7 @@ class DatabaseAsync(DatabaseView):
 
 appbuilder.add_view_no_menu(DatabaseAsync)
 
+
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     return send_from_directory(config['UPLOAD_FOLDER'],
@@ -458,6 +459,7 @@ class CsvToDatabaseView(SimpleFormView):
             return filename
 
 appbuilder.add_view_no_menu(CsvToDatabaseView)
+
 
 class DatabaseTablesAsync(DatabaseView):
     list_columns = ['id', 'all_table_names', 'all_schema_names']
