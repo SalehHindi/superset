@@ -1,4 +1,4 @@
-Saleh Hindi's Superset Fork
+Superset
 =========
 Commits
 
