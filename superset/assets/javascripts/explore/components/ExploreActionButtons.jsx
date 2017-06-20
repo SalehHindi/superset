@@ -17,10 +17,6 @@ const propTypes = {
   chartStatus: PropTypes.string,
 };
 
-function downloadSVG() {
-  d3SaveSvg.save(d3.select('svg').node());
-}
-
 export default function ExploreActionButtons({
     chartStatus, canDownload, slice, queryResponse, queryEndpoint }) {
   const exportToCSVClasses = cx('btn btn-default btn-sm', {
@@ -62,7 +58,7 @@ export default function ExploreActionButtons({
 
         <Button
           onClick={() => {
-            downloadSVG();
+            d3SaveSvg.save(d3.select('svg').node());
           }}
           tooltip="Export as .svg"
         >
