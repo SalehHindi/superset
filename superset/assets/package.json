@@ -47,6 +47,7 @@
     "d3": "^3.5.15",
     "d3-cloud": "^1.2.1",
     "d3-sankey": "^0.4.2",
+    "d3-save-svg": "^0.0.2",
     "d3-tip": "^0.6.7",
     "datamaps": "^0.5.8",
     "datatables-bootstrap3-plugin": "^0.5.0",

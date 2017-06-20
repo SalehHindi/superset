@@ -1,9 +1,13 @@
 import React from 'react';
+import d3 from 'd3';
 import PropTypes from 'prop-types';
 import cx from 'classnames';
 import URLShortLinkButton from './URLShortLinkButton';
 import EmbedCodeButton from './EmbedCodeButton';
 import DisplayQueryButton from './DisplayQueryButton';
+import Button from '../../components/Button';
+
+const d3SaveSvg = require('d3-save-svg');
 
 const propTypes = {
   canDownload: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]).isRequired,
@@ -13,11 +17,16 @@ const propTypes = {
   chartStatus: PropTypes.string,
 };
 
+function downloadSVG() {
+  d3SaveSvg.save(d3.select('svg').node());
+}
+
 export default function ExploreActionButtons({
     chartStatus, canDownload, slice, queryResponse, queryEndpoint }) {
   const exportToCSVClasses = cx('btn btn-default btn-sm', {
     'disabled disabledButton': !canDownload,
   });
+
   if (slice) {
     return (
       <div className="btn-group results" role="group">
@@ -50,6 +59,15 @@ export default function ExploreActionButtons({
           queryEndpoint={queryEndpoint}
           chartStatus={chartStatus}
         />
+
+        <Button
+          onClick={() => {
+            downloadSVG();
+          }}
+          tooltip="Export as .svg"
+        >
+          <i className="fa fa-arrow-circle-o-down" />&nbsp;
+        </Button>
       </div>
     );
   }
