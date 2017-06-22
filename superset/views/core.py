@@ -34,6 +34,11 @@ from superset import (
     appbuilder, cache, db, viz, utils, app,
     sm, sql_lab, results_backend, security,
 )
+
+from .images import (
+    BrowserSession, Img
+)
+
 from superset.legacy import cast_form_data
 from superset.utils import has_access, QueryStatus
 from superset.connectors.connector_registry import ConnectorRegistry

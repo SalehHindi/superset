@@ -164,6 +164,9 @@ export function dashboardContainer(dashboard, datasources, userid) {
         .attr('title', 'Click to force refresh')
         .tooltip('fixTitle');
       }
+      // console.log('Slice ###');
+      // $(slice.selector).addClass('first-render-done');
+      // $('#grid-container').append('<div class="first-render-done"></div>'); 
     },
     effectiveExtraFilters(sliceId) {
       const f = [];
@@ -357,4 +360,5 @@ $(document).ready(() => {
   const dashboard = dashboardContainer(state.dashboard, state.datasources, state.user_id);
   initDashboardView(dashboard);
   dashboard.init();
+  $('#grid-container').append('<div class="first-render-done"></div>');
 });

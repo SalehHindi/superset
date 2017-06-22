@@ -74,6 +74,9 @@ setup(
     ],
     extras_require={
         'cors': ['Flask-Cors>=2.0.0'],
+        'images': [
+            'selenium',
+        ],
     },
     tests_require=[
         'codeclimate-test-reporter',

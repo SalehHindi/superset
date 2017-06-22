@@ -51,6 +51,7 @@ class ChartContainer extends React.PureComponent {
     this.state = {
       selector: `#${props.containerId}`,
       showStackTrace: false,
+      firstRenderDone: false,  // Used as a marker for selenium
     };
   }
 
@@ -177,6 +178,7 @@ class ChartContainer extends React.PureComponent {
     this.setState({ mockSlice });
     try {
       visMap[this.props.viz_type](mockSlice, this.props.queryResponse);
+      this.setState({ firstRenderDone: true });
     } catch (e) {
       this.props.actions.chartRenderingFailed(e);
     }
@@ -227,6 +229,9 @@ class ChartContainer extends React.PureComponent {
             src="/static/assets/images/loading.gif"
             style={{ position: 'absolute' }}
           />
+        }
+        { this.state.firstRenderDone &&
+          <div className="first-render-done" />
         }
         <div
           id={this.props.containerId}
