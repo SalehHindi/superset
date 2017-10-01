@@ -6,6 +6,8 @@ from past.builtins import basestring
 from flask import Markup, flash, redirect
 from flask_appbuilder import CompactCRUDMixin, expose
 from flask_appbuilder.models.sqla.interface import SQLAInterface
+from flask_appbuilder.actions import action
+
 import sqlalchemy as sa
 
 from flask_babel import lazy_gettext as _
@@ -276,6 +278,10 @@ class TableModelView(DatasourceModelView, DeleteMixin):  # noqa
         if isinstance(resp, basestring):
             return resp
         return redirect('/superset/explore/table/{}/'.format(pk))
+   
+    @action("upload_csv", "Upload CSV", "BLAH", "fa-rocket")
+    def upload_csv(self, items):
+        return redirect('csvtodatabaseview/form')
 
 appbuilder.add_view(
     TableModelView,
