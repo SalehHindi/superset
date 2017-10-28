@@ -15,6 +15,7 @@ import unittest
 import sys
 
 from flask import escape
+import sqlalchemy as sqla
 
 from superset import app, db, utils, appbuilder, sm, jinja_context, sql_lab
 from superset.models import core as models
@@ -277,13 +278,15 @@ class CoreTests(SupersetTestCase):
         assert self.get_resp('/health') == "OK"
         assert self.get_resp('/ping') == "OK"
 
-    def test_testconn(self):
+    def test_testconn(self, username='admin'):
+        self.login(username=username)
         database = self.get_main_database(db.session)
 
         # validate that the endpoint works with the password-masked sqlalchemy uri
         data = json.dumps({
             'uri': database.safe_sqlalchemy_uri(),
-            'name': 'main'
+            'name': 'main',
+            'impersonate_user': False
         })
         response = self.client.post('/superset/testconn', data=data, content_type='application/json')
         assert response.status_code == 200
@@ -292,11 +295,25 @@ class CoreTests(SupersetTestCase):
         # validate that the endpoint works with the decrypted sqlalchemy uri
         data = json.dumps({
             'uri': database.sqlalchemy_uri_decrypted,
-            'name': 'main'
+            'name': 'main',
+            'impersonate_user': False
         })
         response = self.client.post('/superset/testconn', data=data, content_type='application/json')
         assert response.status_code == 200
         assert response.headers['Content-Type'] == 'application/json'
+
+    def test_custom_password_store(self):
+        database = self.get_main_database(db.session)
+        conn_pre = sqla.engine.url.make_url(database.sqlalchemy_uri_decrypted)
+
+        def custom_password_store(uri):
+            return "password_store_test"
+
+        database.custom_password_store = custom_password_store
+        conn = sqla.engine.url.make_url(database.sqlalchemy_uri_decrypted)
+        if conn_pre.password:
+            assert conn.password == "password_store_test"
+            assert conn.password != conn_pre.password
 
     def test_databaseview_edit(self, username='admin'):
         # validate that sending a password-masked uri does not over-write the decrypted uri
@@ -781,6 +798,25 @@ class CoreTests(SupersetTestCase):
         form_post = self.get_resp(url, data=form_data)
         assert 'CSV file "tests_testCSV.csv" uploaded to table' in form_post
         os.remove('tests/testCSV.csv')        
+
+    def test_slice_query_endpoint(self):
+        # API endpoint for query string
+        self.login(username="admin")
+        slc = self.get_slice("Girls", db.session)
+        resp = self.get_resp('/superset/slice_query/{}/'.format(slc.id))
+        assert 'query' in resp
+        assert 'language' in resp
+        self.logout();
+
+    def test_viz_get_fillna_for_columns(self):
+        slc = self.get_slice("Girls", db.session)
+        q = slc.viz.query_obj()
+        results = slc.viz.datasource.query(q)
+        fillna_columns = slc.viz.get_fillna_for_columns(results.df.columns)
+        self.assertDictEqual(
+            fillna_columns,
+            {'name': ' NULL', 'sum__num': 0}
+        )
 
 if __name__ == '__main__':
     unittest.main()
