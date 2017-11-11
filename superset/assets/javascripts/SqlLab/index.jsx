@@ -17,6 +17,9 @@ import '../components/FilterableTable/FilterableTableStyles.css';
 appSetup();
 initJQueryAjax();
 
+console.log('hiiiii')
+debugger
+
 const appContainer = document.getElementById('app');
 const bootstrapData = JSON.parse(appContainer.getAttribute('data-bootstrap'));
 const state = Object.assign({}, getInitialState(bootstrapData.defaultDbId), bootstrapData);

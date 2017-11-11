@@ -316,6 +316,11 @@ class DatabaseAsync(DatabaseView):
 appbuilder.add_view_no_menu(DatabaseAsync)
 
 
+@app.route('/BLAH')
+def upload_file2(filename):
+    pass
+
+
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     with open("flask-stream-demo", "bw") as f:
@@ -325,9 +330,6 @@ def uploaded_file(filename):
             if len(chunk) == 0:
                 return
             f.write(chunk)
-
-    #return send_from_directory(config['UPLOAD_FOLDER'],
-    #                           filename)
 
 class CsvToDatabaseView(SimpleFormView):
     form = CsvToDatabaseForm
@@ -2573,6 +2575,14 @@ class Superset(BaseSupersetView):
         if not self.datasource_access(viz_obj.datasource):
             return json_error_response(DATASOURCE_ACCESS_ERR, status=401)
         return self.get_query_string_response(viz_obj)
+
+    @expose('/NAN')
+    @api
+    def showTemplate(self):
+        return self.render_template(
+            'superset/basic.html',
+            entry='csvupload'
+        )
 
 appbuilder.add_view_no_menu(Superset)
 
