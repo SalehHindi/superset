@@ -12,7 +12,6 @@ appSetup();
 // Need to change profile view container to formviewcontainer
 const profileViewContainer = document.getElementById('app');
 
-debugger;
 ReactDOM.render(
   <App user={"HELLO WORLD PROP"} />,
   profileViewContainer,
