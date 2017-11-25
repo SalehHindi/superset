@@ -160,6 +160,7 @@ class TableModelView(DatasourceModelView, DeleteMixin):  # noqa
     list_columns = [
         'link', 'database',
         'changed_by_', 'modified']
+    list_template = "superset/models/tables/list.html"
     order_columns = ['modified']
     add_columns = ['database', 'schema', 'table_name']
     edit_columns = [

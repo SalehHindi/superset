@@ -326,9 +326,6 @@ def uploaded_file(filename):
                 return
             f.write(chunk)
 
-    #return send_from_directory(config['UPLOAD_FOLDER'],
-    #                           filename)
-
 class CsvToDatabaseView(SimpleFormView):
     form = CsvToDatabaseForm
     form_title = _('CSV to Database configuration')
