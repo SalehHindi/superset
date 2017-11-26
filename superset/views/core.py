@@ -472,12 +472,15 @@ class CsvToDatabaseView(SimpleFormView):
                     .filter_by(sqlalchemy_uri=con)
                     .first()
         )
+
+        # Am I creating this table correctly?
         table.database_id = database.id 
         table.user_id = g.user.id 
         table.database = database
         table.schema = schema
         db.session.add(table)
         db.session.commit()
+
         # Should I set this to g.user? The other tables don't have an owner.
         # table.owner = g.user.id
         # Do I need to set table.sql? None of the default tables have it set.

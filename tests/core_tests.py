@@ -770,6 +770,7 @@ class CoreTests(SupersetTestCase):
         os.environ['SUPERSET_CONFIG'] = 'tests.superset_test_config'
         con = app.config.get('SQLALCHEMY_DATABASE_URI')
         
+        # Need to fix this...
         if sys.version_info[0] == 2:
             test_file = open('tests/testCSV.csv', 'w+b')
             csv_writer = csv.writer(test_file)
@@ -781,15 +782,22 @@ class CoreTests(SupersetTestCase):
             test_file.write(b'Column 3, Column 4')
         test_file.seek(0)
 
-        form_data = {'csv_file': test_file,
+        new_table_name = 'TestName'
+        form_data = {'name': new_table_name,
+                            'csv_file': test_file,
                             'sep': ',',
-                            'name': 'TestName',
                             'con': con,
                             'if_exists': 'append',
                             'index_label': 'test_label',
                             'chunksize': 1,
                             'mangle_dupe_cols': True}
 
+        # test that the add csv button exists on the page
+        url = '/tablemodelview/list/'
+        form_get = self.get_resp(url)
+        assert 'Import CSV' in form_get
+
+        # test that the form renders
         url = '/csvtodatabaseview/form'
         form_get = self.get_resp(url)
         assert 'CSV to Database configuration' in form_get
@@ -797,7 +805,12 @@ class CoreTests(SupersetTestCase):
         self.login(username='admin')
         form_post = self.get_resp(url, data=form_data)
         assert 'CSV file "tests_testCSV.csv" uploaded to table' in form_post
-        os.remove('tests/testCSV.csv')        
+
+        # clean up filesystem and table
+        os.remove('tests/testCSV.csv')
+        newly_created_table = db.session.query(SqlaTable).filter_by(table_name=new_table_name).first()
+        db.session.delete(newly_created_table)
+        db.session.commit()
 
     def test_slice_query_endpoint(self):
         # API endpoint for query string

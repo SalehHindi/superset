@@ -275,6 +275,7 @@ class TableModelView(DatasourceModelView, DeleteMixin):  # noqa
             return resp
         return redirect('/superset/explore/table/{}/'.format(pk))
    
+    # Need to fix this
     @action("upload_csv", "Upload CSV", "BLAH", "fa-rocket")
     def upload_csv(self, items):
         return redirect('csvtodatabaseview/form')
