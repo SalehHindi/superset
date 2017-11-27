@@ -474,9 +474,9 @@ class CsvToDatabaseView(SimpleFormView):
         )
 
         # Am I creating this table correctly?
-        table.database_id = database.id 
-        table.user_id = g.user.id 
-        table.database = database
+        # table.database_id = database.id
+        table.user_id = g.user.id
+        # table.database = database
         table.schema = schema
         db.session.add(table)
         db.session.commit()
