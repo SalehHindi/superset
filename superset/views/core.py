@@ -315,7 +315,7 @@ class DatabaseAsync(DatabaseView):
 
 appbuilder.add_view_no_menu(DatabaseAsync)
 
-
+# Need to fix this
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     with open("flask-stream-demo", "bw") as f:
