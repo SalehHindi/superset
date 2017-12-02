@@ -1,7 +1,8 @@
 import React from 'react';
 import { formatSelectOptionsForRange, formatSelectOptions } from '../../modules/utils';
 import * as v from '../validators';
-import { ALL_COLOR_SCHEMES, spectrums } from '../../modules/colors';
+import { colorPrimary, ALL_COLOR_SCHEMES, spectrums } from '../../modules/colors';
+import { defaultViewport } from '../../modules/geo';
 import MetricOption from '../../components/MetricOption';
 import ColumnOption from '../../components/ColumnOption';
 import OptionDescription from '../../components/OptionDescription';
@@ -135,6 +136,14 @@ export const controls = {
     }),
   },
 
+  color_picker: {
+    label: t('Fixed Color'),
+    description: t('Use this to define a static color for all circles'),
+    type: 'ColorPickerControl',
+    default: colorPrimary,
+    renderTrigger: true,
+  },
+
   annotation_layers: {
     type: 'SelectAsyncControl',
     multi: true,
@@ -219,6 +228,7 @@ export const controls = {
       ['white_black', 'white/black'],
       ['black_white', 'black/white'],
       ['dark_blue', 'light/dark blue'],
+      ['pink_grey', 'pink/white/grey'],
     ],
     default: 'blue_white_yellow',
     clearable: false,
@@ -424,6 +434,13 @@ export const controls = {
   },
 
   groupby: groupByControl,
+  dimension: {
+    ...groupByControl,
+    label: t('Dimension'),
+    description: t('Select a dimension'),
+    multi: false,
+    default: null,
+  },
 
   columns: Object.assign({}, groupByControl, {
     label: t('Columns'),
@@ -436,6 +453,28 @@ export const controls = {
     label: t('Columns'),
     default: [],
     description: t('Columns to display'),
+    mapStateToProps: state => ({
+      choices: (state.datasource) ? state.datasource.all_cols : [],
+    }),
+  },
+
+  longitude: {
+    type: 'SelectControl',
+    label: t('Longitude'),
+    default: 1,
+    validators: [v.nonEmpty],
+    description: t('Select the longitude column'),
+    mapStateToProps: state => ({
+      choices: (state.datasource) ? state.datasource.all_cols : [],
+    }),
+  },
+
+  latitude: {
+    type: 'SelectControl',
+    label: t('Latitude'),
+    default: 1,
+    validators: [v.nonEmpty],
+    description: t('Select the latitude column'),
     mapStateToProps: state => ({
       choices: (state.datasource) ? state.datasource.all_cols : [],
     }),
@@ -568,17 +607,28 @@ export const controls = {
   granularity_sqla: {
     type: 'SelectControl',
     label: t('Time Column'),
-    default: control =>
-      control.choices && control.choices.length > 0 ? control.choices[0][0] : null,
     description: t('The time column for the visualization. Note that you ' +
     'can define arbitrary expression that return a DATETIME ' +
-    'column in the table or. Also note that the ' +
+    'column in the table. Also note that the ' +
     'filter below is applied against this column or ' +
     'expression'),
-    mapStateToProps: state => ({
-      choices: (state.datasource) ? state.datasource.granularity_sqla : [],
-    }),
-    freeForm: true,
+    default: (c) => {
+      if (c.options && c.options.length > 0) {
+        return c.options[0].column_name;
+      }
+      return null;
+    },
+    clearable: false,
+    optionRenderer: c => <ColumnOption column={c} />,
+    valueRenderer: c => <ColumnOption column={c} />,
+    valueKey: 'column_name',
+    mapStateToProps: (state) => {
+      const newState = {};
+      if (state.datasource) {
+        newState.options = state.datasource.columns.filter(c => c.is_dttm);
+      }
+      return newState;
+    },
   },
 
   time_grain_sqla: {
@@ -680,6 +730,7 @@ export const controls = {
     type: 'SelectControl',
     freeForm: true,
     label: t('Row limit'),
+    validators: [v.integer],
     default: null,
     choices: formatSelectOptions(ROW_LIMIT_OPTIONS),
   },
@@ -688,6 +739,7 @@ export const controls = {
     type: 'SelectControl',
     freeForm: true,
     label: t('Series limit'),
+    validators: [v.integer],
     choices: formatSelectOptions(SERIES_LIMITS),
     default: 50,
     description: t('Limits the number of time series that get displayed'),
@@ -719,12 +771,29 @@ export const controls = {
     'with the [Periods] text box'),
   },
 
+  multiplier: {
+    type: 'TextControl',
+    label: t('Multiplier'),
+    isFloat: true,
+    default: 1,
+    description: t('Factor to multiply the metric by'),
+  },
+
   rolling_periods: {
     type: 'TextControl',
     label: t('Periods'),
     isInt: true,
     description: t('Defines the size of the rolling window function, ' +
     'relative to the time granularity selected'),
+  },
+
+  grid_size: {
+    type: 'TextControl',
+    label: t('Grid Size'),
+    renderTrigger: true,
+    default: 20,
+    isInt: true,
+    description: t('Defines the grid size in pixels'),
   },
 
   min_periods: {
@@ -1032,6 +1101,14 @@ export const controls = {
     ),
   },
 
+  extruded: {
+    type: 'CheckboxControl',
+    label: t('Extruded'),
+    renderTrigger: true,
+    default: true,
+    description: ('Whether to make the grid 3D'),
+  },
+
   show_brush: {
     type: 'CheckboxControl',
     label: t('Range Filter'),
@@ -1244,6 +1321,7 @@ export const controls = {
   mapbox_style: {
     type: 'SelectControl',
     label: t('Map Style'),
+    renderTrigger: true,
     choices: [
       ['mapbox://styles/mapbox/streets-v9', 'Streets'],
       ['mapbox://styles/mapbox/dark-v9', 'Dark'],
@@ -1277,6 +1355,15 @@ export const controls = {
     'number of points (>1000) will cause lag.'),
   },
 
+  point_radius_fixed: {
+    type: 'FixedOrMetricControl',
+    label: t('Point Size'),
+    description: t('Fixed point radius'),
+    mapStateToProps: state => ({
+      datasource: state.datasource,
+    }),
+  },
+
   point_radius: {
     type: 'SelectControl',
     label: t('Point Radius'),
@@ -1297,6 +1384,22 @@ export const controls = {
     description: t('The unit of measure for the specified point radius'),
   },
 
+  point_unit: {
+    type: 'SelectControl',
+    label: t('Point Unit'),
+    default: 'square_m',
+    clearable: false,
+    choices: [
+      ['square_m', 'Square meters'],
+      ['square_km', 'Square kilometers'],
+      ['square_miles', 'Square miles'],
+      ['radius_m', 'Radius in meters'],
+      ['radius_km', 'Radius in kilometers'],
+      ['radius_miles', 'Radius in miles'],
+    ],
+    description: t('The unit of measure for the specified point radius'),
+  },
+
   global_opacity: {
     type: 'TextControl',
     label: t('Opacity'),
@@ -1304,6 +1407,15 @@ export const controls = {
     isFloat: true,
     description: t('Opacity of all clusters, points, and labels. ' +
     'Between 0 and 1.'),
+  },
+
+  viewport: {
+    type: 'ViewportControl',
+    label: t('Viewport'),
+    renderTrigger: true,
+    description: t('Parameters related to the view and perspective on the map'),
+    // default is whole world mostly centered
+    default: defaultViewport,
   },
 
   viewport_zoom: {
@@ -1359,6 +1471,7 @@ export const controls = {
   color: {
     type: 'ColorPickerControl',
     label: t('Color'),
+    default: colorPrimary,
     description: t('Pick a color'),
   },
 

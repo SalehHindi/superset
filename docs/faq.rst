@@ -45,6 +45,13 @@ visualizations.
 https://github.com/airbnb/superset/issues?q=label%3Aexample+is%3Aclosed
 
 
+Can I upload and visualize csv data?
+-------------------------------------
+
+Yes, using the ``Upload a CSV`` button under the ``Sources``
+menu item. This brings up a form that allows you specify required information. After creating the table from CSV, it can then be loadede like any other on the ``Sources -> Tables``page.
+
+
 Why are my queries timing out?
 ------------------------------
 
@@ -170,8 +177,8 @@ You can override this path using the ``SUPERSET_HOME`` environment variable.
 
 Another work around is to change where superset stores the sqlite database by adding ``SQLALCHEMY_DATABASE_URI = 'sqlite:////new/location/superset.db'`` in superset_config.py (create the file if needed), then adding the directory where superset_config.py lives to PYTHONPATH environment variable (e.g. ``export PYTHONPATH=/opt/logs/sandbox/airbnb/``).
 
-How do I add new columns to an existing table
----------------------------------------------
+What if the table schema changed?
+---------------------------------
 
 Table schemas evolve, and Superset needs to reflect that. It's pretty common
 in the life cycle of a dashboard to want to add a new dimension or metric.
@@ -221,3 +228,19 @@ When adding columns to a table, you can have Superset detect and merge the
 new columns in by using the "Refresh Metadata" action in the
 ``Source -> Tables`` page. Simply check the box next to the tables
 you want the schema refreshed, and click ``Actions -> Refresh Metadata``.
+
+Is there a way to force the use specific colors?
+------------------------------------------------
+
+It is possible on a per-dashboard basis by providing a mapping of
+labels to colors in the ``JSON Metadata`` attribute using the
+``label_colors`` key.
+
+..code::
+
+	{
+	  "label_colors": {
+		"Girls": "#FF69B4",
+		"Boys": "#ADD8E6"
+	  }
+	}
