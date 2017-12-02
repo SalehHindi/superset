@@ -185,8 +185,23 @@ div.widget .chart-header a {
   display: none;
 }
 
-div.widget .slice_container {
-  overflow: hidden;
+div.widget {
+  .slice_container {
+    overflow: hidden;
+  }
+
+  .stack-trace-container.has-trace {
+    .alert-warning:hover {
+      cursor: pointer;
+    }
+  }
+
+  .is-loading {
+    .stack-trace-container,
+    .slice_container {
+      opacity: 0.5;
+    }
+  }
 }
 
 .navbar .alert {
@@ -201,6 +216,10 @@ div.widget .slice_container {
 
 .table-condensed input[type="checkbox"] {
     float: left;
+}
+
+table.table-no-hover tr:hover {
+    background-color: initial;
 }
 
 .editable-title input {
@@ -339,23 +358,6 @@ iframe {
 }
 .text-transparent {
     color: transparent;
-}
-
-// overwrite react-select css
-.Select--multi {
-  .Select-multi-value-wrapper {
-    display: flex;
-    flex-wrap: wrap;
-    padding-bottom: 3px;
-  }
-
-  .Select-value {
-    line-height: 1.2;
-  }
-
-  .Select-input > input {
-    width: 100px;
-  }
 }
 
 .dimmed {
