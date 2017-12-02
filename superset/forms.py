@@ -1361,8 +1361,6 @@ class CsvToDatabaseForm(DynamicForm):
                               widget=BS3TextFieldWidget(),
                               filters=[lambda x: x or None])
     
-=======
-
 class CsvToDatabaseForm(DynamicForm):
     name = StringField(
         _('Table Name'),
