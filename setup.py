@@ -70,6 +70,7 @@ setup(
         'python-dateutil==2.6.0',
         'pyyaml>=3.11',
         'requests==2.17.3',
+        # 'selenium probably==0000'
         'simplejson==3.10.0',
         'six==1.10.0',
         'sqlalchemy==1.1.9',
