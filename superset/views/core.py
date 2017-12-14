@@ -13,9 +13,15 @@ import re
 import time
 import traceback
 from urllib import parse
+import pdb
+from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+import time
 
 from flask import (
-    flash, g, Markup, redirect, render_template, request, Response, url_for,
+    flash, g, Markup, redirect, render_template, request, Response, url_for, send_file
 )
 from flask_appbuilder import expose, SimpleFormView
 from flask_appbuilder.actions import action
@@ -656,6 +662,36 @@ appbuilder.add_view(
 def health():
     return 'OK'
 
+@app.route('/export_slice/<slice_id>')
+def export_slice(slice_id):
+    # Stream file 
+    # Could turn into class Slice Exporter later
+
+    # appbuilder.get_url_for_login
+    url = 'http://localhost:8080/login/'
+    phantom = webdriver.PhantomJS()
+    phantom.get(url)
+
+    username = phantom.find_element_by_id("username")
+    password = phantom.find_element_by_id("password")
+    username.send_keys("shindi")
+    password.send_keys("password")
+    phantom.find_element_by_css_selector(".btn-primary").click()
+
+    slice = db.session.query(models.Slice).filter_by(id=int(slice_id))
+    all_slices = slice.all()
+    first = all_slices[0]
+    slice_url = first.slice_url
+    url = 'http://localhost:8080' + slice_url
+    phantom.get(url)
+
+    y = phantom.find_element_by_id('slice-container-' + slice_id).get_attribute('innerHTML').encode('utf-8')
+    # Need to convert to streaming bits to prevent saving file
+    svg_file = open("superset/imageToSave.html", "w")
+    svg_file.write(y)
+    svg_file.close()
+
+    return send_file("imageToSave.html", attachment_filename="blah.html", as_attachment=True)
 
 @app.route('/healthcheck')
 def healthcheck():
