@@ -667,13 +667,19 @@ def export_slice(slice_id):
     # Stream file 
     # Could turn into class Slice Exporter later
 
-    # appbuilder.get_url_for_login
+    # Test exporting styles
+    # Test that this endpoint lets you log in and export a slice
+
+    # t = appbuilder.get_url_for_login
+    # Something like 'https://' + config['SUPERSET_WEBSERVER_ADDRESS'] + ":" + config['SUPERSET_WEBSERVER_PORT'] + t
     url = 'http://localhost:8080/login/'
     phantom = webdriver.PhantomJS()
     phantom.get(url)
 
     username = phantom.find_element_by_id("username")
     password = phantom.find_element_by_id("password")
+
+    # Change Username and Password
     username.send_keys("shindi")
     password.send_keys("password")
     phantom.find_element_by_css_selector(".btn-primary").click()
@@ -685,10 +691,45 @@ def export_slice(slice_id):
     url = 'http://localhost:8080' + slice_url
     phantom.get(url)
 
+    time.sleep(7)
     y = phantom.find_element_by_id('slice-container-' + slice_id).get_attribute('innerHTML').encode('utf-8')
+    # Figure out how to pass in variables here
+    x = phantom.execute_script("" +
+        "var x = [];                                                                            " +
+        "var foo = document.getElementById('slice-container-' + arguments[0]);                                                                           " +
+        "function isInteger(x) {                                                                                                            " +
+        "    return x % 1 === 0;                                                                                                            " +
+        "}                                                                                                          " +
+        "function walk(node) {                                                                          " +
+        "   if (!node) { return } ;                                                                         " +
+        "   var children = node.childNodes;                                                                         " +
+        "   for (var i = 0; i < children.length; i++) {                                                                             " +
+        "       walk(children[i]);                                                                          " +
+        "   }                                                                           " +
+        "                                                                           " +
+        "   if (node && node.style) {                                                                            " +
+        "     var externalStyles = node.style.cssText;                                                                          " +
+        "     externalStyles = Object.keys(getComputedStyle( node ))                                                                                                           " +
+        "      .map(function(key) {                                                                                                           " +
+        "        return key + ':' +  getComputedStyle( node )[key] + ';'                                                                                                         " +
+        "      })                                                                                                           " +
+        "      .filter(function(s) {                                                                                                          " +
+        "        return !isInteger(s.split(':')[0])                                                                                                           " +
+        "      })                                                                                                         " +
+        "      .reduce(function(x, sum){                                                                                                          " +
+        "        return x+sum                                                                                                            " +
+        "      });"   +
+        "     node.style.cssText = externalStyles;                                                                            " +
+        "   }                                                                       " +
+        "}                                                                       " +
+        "walk(foo);                                                         " +
+        "return foo.innerHTML;                                          " + 
+        "", str(slice_id))
+
     # Need to convert to streaming bits to prevent saving file
     svg_file = open("superset/imageToSave.html", "w")
-    svg_file.write(y)
+    svg_file.write(x.encode('utf-8'))
+    # svg_file.write(y)
     svg_file.close()
 
     return send_file("imageToSave.html", attachment_filename="blah.html", as_attachment=True)
